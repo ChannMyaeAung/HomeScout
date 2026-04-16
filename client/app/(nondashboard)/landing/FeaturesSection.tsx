@@ -20,6 +20,30 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
+const features = [
+  {
+    imageSrc: "/landing-search3.png",
+    title: "Trustworthy and Verified Listings",
+    description: "Discover the best rental options with user reviews and ratings.",
+    linkText: "Explore",
+    linkHref: "/explore",
+  },
+  {
+    imageSrc: "/landing-search2.png",
+    title: "Browse Rental Listings with Ease",
+    description: "Get access to user reviews and ratings for a better understanding of rental options.",
+    linkText: "Search",
+    linkHref: "/search",
+  },
+  {
+    imageSrc: "/landing-search1.png",
+    title: "Simplify Your Rental Search with Advanced",
+    description: "Find trustworthy and verified rental listings to ensure a hassle-free experience.",
+    linkText: "Discover",
+    linkHref: "/discover",
+  },
+];
+
 const FeaturesSection = () => {
   return (
     <motion.div
@@ -38,25 +62,9 @@ const FeaturesSection = () => {
         </motion.h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 xl:gap-16">
-          {[0, 1, 2].map((index) => (
-            <motion.div key={index} variants={itemVariants}>
-              <FeatureCard
-                imageSrc={`/landing-search${3 - index}.png`}
-                title={
-                  [
-                    "Trustworthy and Verified Listings",
-                    "Browse Rental Listings with Ease",
-                    "Simplify Your Rental Search with Advanced",
-                  ][index]
-                }
-                description={
-                  [
-                    "Discover the best rental options with user reviews and ratings.",
-                    "Get access to user reviews and ratings for a better understanding of rental options.",
-                    "Find trustworthy and verified rental listings to ensure a hassle-free experience.",
-                  ][index]
-                }
-              />
+          {features.map((feature) => (
+            <motion.div key={feature.title} variants={itemVariants}>
+              <FeatureCard {...feature} />
             </motion.div>
           ))}
         </div>

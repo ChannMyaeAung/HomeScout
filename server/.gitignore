@@ -21,3 +21,5 @@ pnpm-debug.log*
 # Prisma
 prisma/migrations/dev.db
 prisma/*.db
+
+/src/generated/prisma

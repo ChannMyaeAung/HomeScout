@@ -227,7 +227,11 @@
 /* Amplify UI Overrides */
 [data-amplify-authenticator] {
   --amplify-components-button-primary-background-color: var(--primary);
-  --amplify-components-button-primary-hover-background-color: color-mix(in srgb, var(--primary) 90%, transparent);
+  --amplify-components-button-primary-hover-background-color: color-mix(
+    in srgb,
+    var(--primary) 90%,
+    transparent
+  );
   --amplify-components-button-border-radius: var(--radius);
   --amplify-components-fieldcontrol-border-radius: var(--radius);
 }
@@ -269,7 +273,11 @@
 }
 
 [data-amplify-authenticator] .amplify-button--primary:hover {
-  background-color: color-mix(in srgb, var(--primary) 80%, transparent) !important;
+  background-color: color-mix(
+    in srgb,
+    var(--primary) 80%,
+    transparent
+  ) !important;
 }
 
 [data-amplify-authenticator] .amplify-field-group__control {

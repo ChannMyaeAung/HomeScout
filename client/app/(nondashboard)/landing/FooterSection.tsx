@@ -15,7 +15,10 @@ const FooterSection = () => {
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="mb-4">
             <Link href={"/"} className="text-xl font-bold" scroll={false}>
-              HOMESCOUT
+              HOME
+              <span className="text-secondary-500 font-light hover:text-primary-300!">
+                SCOUT
+              </span>
             </Link>
           </div>
 

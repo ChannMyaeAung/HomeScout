@@ -26,7 +26,12 @@ const Navbar = () => {
                 height={24}
                 className="w-6 h-6"
               />
-              <div className="text-xl font-bold">HomeScout</div>
+              <div className="text-xl font-bold">
+                HOME
+                <span className="text-secondary-500 font-light hover:text-primary-300!">
+                  SCOUT
+                </span>
+              </div>
             </div>
           </Link>
         </div>

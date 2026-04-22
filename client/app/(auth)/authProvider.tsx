@@ -1,12 +1,18 @@
-import React from "react";
+"use client";
+import React, { useEffect } from "react";
 import { Amplify } from "aws-amplify";
 
 import {
   Authenticator,
-  components,
+  Heading,
+  Radio,
+  RadioGroupField,
   useAuthenticator,
+  View,
 } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
+import { usePathname, useRouter } from "next/navigation";
+
 Amplify.configure({
   Auth: {
     Cognito: {
@@ -16,6 +22,86 @@ Amplify.configure({
     },
   },
 });
+
+// Custom components for the Authenticator
+// Header and Footer(Don't have an account? Sign up Here) are implemented here
+// Between Header and Footer we have the formFields defined just below.
+// Header() + FormFields + Footer() are passed as props to the Authenticator component in the Auth component below.
+const components = {
+  Header() {
+    return (
+      <View className="mt-4 ml-1.5 mb-7">
+        <Heading level={3} className="text-2xl! font-bold!">
+          HOME
+          <span className="text-secondary-500 font-light hover:text-primary-300!">
+            SCOUT
+          </span>
+        </Heading>
+        <p className="text-muted-foreground mt-2">
+          <span className="font-bold">Welcome!</span> Please sign in to continue
+        </p>
+      </View>
+    );
+  },
+
+  SignIn: {
+    Footer() {
+      const { toSignUp } = useAuthenticator();
+      return (
+        <View className="text-center mt-4">
+          <p className="text-muted-foreground">
+            Don&apos;t have an account?{" "}
+            <button
+              onClick={toSignUp}
+              className="text-primary cursor-pointer hover:underline bg-transparent border-none p-0"
+            >
+              Sign up Here
+            </button>
+          </p>
+        </View>
+      );
+    },
+  },
+
+  // For signup, we want to add an additional field for the user to select their role (tenant or manager)
+  SignUp: {
+    FormFields() {
+      const { validationErrors } = useAuthenticator();
+      return (
+        <>
+          <Authenticator.SignUp.FormFields />
+          <RadioGroupField
+            legend="Role"
+            name="custom:role"
+            errorMessage={validationErrors?.["custom:role"]}
+            hasError={!!validationErrors?.["custom:role"]}
+            isRequired
+          >
+            <Radio value="tenant">Tenant</Radio>
+            <Radio value="manager">Manager</Radio>
+          </RadioGroupField>
+        </>
+      );
+    },
+
+    Footer() {
+      const { toSignIn } = useAuthenticator();
+      return (
+        <View className="text-center mt-4">
+          <p className="text-muted-foreground">
+            Already have an account?{" "}
+            <button
+              onClick={toSignIn}
+              className="text-primary cursor-pointer hover:underline bg-transparent border-none p-0"
+            >
+              Sign in
+            </button>
+          </p>
+        </View>
+      );
+    },
+  },
+};
 
 // Can be found at https://ui.docs.amplify.aws/react/connected-components/authenticator/customization
 const formFields = {
@@ -61,9 +147,31 @@ const formFields = {
 
 const Auth = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuthenticator((context) => [context.user]);
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const isAuthPage = pathname.match(/^\/(signin|signup)$/);
+  const isDashboardPage =
+    pathname.startsWith("/manager") || pathname.startsWith("/tenants");
+
+  useEffect(() => {
+    if (user && isAuthPage) {
+      router.push("/"); // Redirect to home page after sign in/up
+    }
+  }, [user, isAuthPage, router]);
+
+  // Allow access to public pages without authentication
+  if (!isAuthPage && !isDashboardPage) {
+    return <>{children}</>;
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <Authenticator formFields={formFields}>
+      <Authenticator
+        initialState={pathname.includes("signup") ? "signUp" : "signIn"}
+        components={components}
+        formFields={formFields}
+      >
         {() => <>{children}</>}
       </Authenticator>
     </div>

@@ -21,6 +21,9 @@ declare global {
 }
 
 // Middleware to check if the user is authenticated and has the correct role
+// Functionality: decodes and verifies the JWT against Cognito's public key
+// If valid, it attaches the user's identity to req.user
+// so controllers know who is asking
 // allowedRoles is an array of strings because there might be routes that
 // both tenants and managers can access.
 // we can try decoding the token in jwt.io

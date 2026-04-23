@@ -1,3 +1,4 @@
+import { createNewUserInDatabase } from "@/lib/utils";
 import { Manager, Tenant } from "@/types/prisma/browser";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { fetchAuthSession, getCurrentUser } from "aws-amplify/auth";
@@ -5,6 +6,11 @@ import { fetchAuthSession, getCurrentUser } from "aws-amplify/auth";
 export const api = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
+
+    // Every single RTK request goes through this function,
+    // which grabs the stored JWT from Amplify (fetchAuthSession)
+    // and attaches it as
+    // Authorization: Bearer <token> to the HTTP request header.
     prepareHeaders: async (headers) => {
       const session = await fetchAuthSession();
       const { idToken } = session.tokens ?? {};
@@ -17,6 +23,10 @@ export const api = createApi({
   reducerPath: "api",
   tagTypes: [],
   endpoints: (build) => ({
+    // Runs once after signing in to answer "who is this JWT user in our database?"
+    // Reads the role from the JWT payload
+    // Calls /tenants/:id or /managers/:id on the backend
+    // Returns the combined Cognito + databse user object
     getAuthUser: build.query<User, void>({
       queryFn: async (_, _queryApi, _extraoptions, fetchWithBQ) => {
         try {
@@ -29,9 +39,21 @@ export const api = createApi({
               ? `/managers/${user.userId}`
               : `/tenants/${user.userId}`;
 
-          const userDetailsResponse = await fetchWithBQ(endpoint);
+          let userDetailsResponse = await fetchWithBQ(endpoint);
 
           // if user doesn't exist, create new user
+          // we are gonna try and call getTenant in /server/src/controllers/tenantControllers.ts and see if it returns 404, if it does, we will create a new tenant with the same cognitoId as the user
+          if (
+            userDetailsResponse.error &&
+            userDetailsResponse.error.status === 404
+          ) {
+            userDetailsResponse = await createNewUserInDatabase(
+              user,
+              idToken,
+              userRole,
+              fetchWithBQ,
+            );
+          }
 
           return {
             data: {
@@ -48,4 +70,4 @@ export const api = createApi({
   }),
 });
 
-export const {} = api;
+export const { useGetAuthUserQuery } = api;

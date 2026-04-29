@@ -21,7 +21,7 @@ export const api = createApi({
     },
   }),
   reducerPath: "api",
-  tagTypes: [],
+  tagTypes: ["Managers", "Tenants"],
   endpoints: (build) => ({
     // Runs once after signing in to answer "who is this JWT user in our database?"
     // Reads the role from the JWT payload
@@ -67,7 +67,39 @@ export const api = createApi({
         }
       },
     }),
+
+    updateTenantSettings: build.mutation<
+      Tenant,
+      { cognitoId: string } & Partial<Tenant>
+    >({
+      query: ({ cognitoId, ...updatedTenant }) => {
+        return {
+          url: `/tenants/${cognitoId}`,
+          method: "PUT",
+          body: updatedTenant,
+        };
+      },
+      invalidatesTags: (result) => [{ type: "Tenants", id: result?.id }], // refresh tenant data after update
+    }),
+
+    updateManagerSettings: build.mutation<
+      Manager,
+      { cognitoId: string } & Partial<Manager>
+    >({
+      query: ({ cognitoId, ...updatedManager }) => {
+        return {
+          url: `/managers/${cognitoId}`,
+          method: "PUT",
+          body: updatedManager,
+        };
+      },
+      invalidatesTags: (result) => [{ type: "Managers", id: result?.id }],
+    }),
   }),
 });
 
-export const { useGetAuthUserQuery } = api;
+export const {
+  useGetAuthUserQuery,
+  useUpdateTenantSettingsMutation,
+  useUpdateManagerSettingsMutation,
+} = api;

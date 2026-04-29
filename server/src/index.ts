@@ -1,5 +1,6 @@
-import express from "express";
+import "dotenv/config";
 import dotenv from "dotenv";
+import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
@@ -20,7 +21,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 
 // ROUTES
-app.get("/", (req, res) => {
+app.get("/", (_req, res) => {
   res.send("This is home route");
 });
 

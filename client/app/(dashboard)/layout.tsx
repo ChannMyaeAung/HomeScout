@@ -4,33 +4,30 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import Sidebar from "@/components/AppSidebar";
 import { NAVBAR_HEIGHT } from "@/lib/constants";
 import { useGetAuthUserQuery } from "@/state/api";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const { data: authUser, isLoading: authLoading } = useGetAuthUserQuery();
   const router = useRouter();
   const pathname = usePathname();
-  const [isLoading, setIsLoading] = useState(true);
+
+  const userRole = authUser?.userRole?.toLowerCase();
+  const isOnWrongRoute =
+    !!userRole &&
+    ((userRole === "manager" && pathname.startsWith("/tenants")) ||
+      (userRole === "tenant" && pathname.startsWith("/managers")));
 
   useEffect(() => {
-    if (authUser) {
-      const userRole = authUser.userRole.toLowerCase();
-      if (
-        (userRole === "manager" && pathname.startsWith("/tenants")) ||
-        (userRole === "tenant" && pathname.startsWith("/managers"))
-      ) {
-        router.push(
-          userRole === "manager"
-            ? "/managers/properties"
-            : "/tenants/favorites",
-          { scroll: false },
-        );
-      }
+    if (isOnWrongRoute) {
+      router.push(
+        userRole === "manager" ? "/managers/properties" : "/tenants/favorites",
+        { scroll: false },
+      );
     }
-  }, [authUser, router, pathname]);
+  }, [isOnWrongRoute, userRole, router]);
 
-  if (authLoading || isLoading) return <>Loading...</>;
+  if (authLoading || isOnWrongRoute) return <>Loading...</>;
 
   if (!authUser?.userRole) return null;
 

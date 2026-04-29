@@ -19,7 +19,7 @@ export const createNewUserInDatabase = async (
     method: "POST",
     body: {
       cognitoId: user.userId,
-      name: user.name,
+      name: user.username,
       email: idToken?.payload.email || "",
       phoneNumber: "", // we don't get phone number from cognito, so we can just set it to empty string for now
     },

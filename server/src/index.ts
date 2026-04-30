@@ -24,7 +24,9 @@ app.use(cors());
 app.get("/", (_req, res) => {
   res.send("This is home route");
 });
+app.use("/properties", propertyRoutes);
 
+// PROTECTED ROUTES
 app.use("/tenants", authMiddleware(["tenant"]), tenantRoutes);
 app.use("/managers", authMiddleware(["manager"]), managerRoutes);
 

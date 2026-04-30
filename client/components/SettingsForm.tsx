@@ -1,7 +1,9 @@
 import { SettingsFormData, settingsSchema } from "@/lib/schemas";
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useState } from "react";
+import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { CustomFormField } from "./FormField";
+import { Button } from "./ui/button";
 
 const SettingsForm = ({
   initialData,
@@ -27,14 +29,49 @@ const SettingsForm = ({
   };
 
   return (
-    <div className="pt-8 pb-5 px-8">
-      <div className="mb-5">
+    <div className="pt-8 pb-6 px-8">
+      <div className="mb-6">
         <h1 className="text-xl font-semibold">
           {`${userType.charAt(0).toUpperCase() + userType.slice(1)} Settings`}
         </h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="text-sm text-gray-500 mt-2">
           Manager your account preferences and personal information
         </p>
+      </div>
+
+      <div className="bg-white rounded-xl p-6">
+        <FormProvider {...form}>
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="flex flex-col gap-6"
+          >
+            <CustomFormField name="name" label="Name" disabled={!editMode} />
+            <CustomFormField name="email" label="Email" disabled={!editMode} />
+            <CustomFormField
+              name="phoneNumber"
+              label="Phone Number"
+              disabled={!editMode}
+            />
+
+            <div className="pt-4 flex justify-between">
+              <Button
+                type="button"
+                onClick={toggleEditMode}
+                className="bg-secondary-500 text-white hover:bg-secondary-600 px-6"
+              >
+                {editMode ? "Cancel" : "Edit"}
+              </Button>
+              {editMode && (
+                <Button
+                  type="submit"
+                  className="bg-primary-700 text-white hover:bg-primary-800"
+                >
+                  Save Changes
+                </Button>
+              )}
+            </div>
+          </form>
+        </FormProvider>
       </div>
     </div>
   );

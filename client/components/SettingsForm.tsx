@@ -64,7 +64,7 @@ const SettingsForm = ({
               {editMode && (
                 <Button
                   type="submit"
-                  className="bg-primary-700 text-white hover:bg-primary-800"
+                  className="bg-primary-700 text-white hover:bg-primary-800 px-6"
                 >
                   Save Changes
                 </Button>

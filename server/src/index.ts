@@ -7,6 +7,7 @@ import morgan from "morgan";
 import { authMiddleware } from "./middleware/authMiddleware.js";
 import tenantRoutes from "./routes/tenantRoutes.js";
 import managerRoutes from "./routes/managerRoutes.js";
+import propertyRoutes from "./routes/propertyRoutes.js";
 
 // ROUTE IMPORT
 

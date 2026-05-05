@@ -8,6 +8,7 @@ import { authMiddleware } from "./middleware/authMiddleware.js";
 import tenantRoutes from "./routes/tenantRoutes.js";
 import managerRoutes from "./routes/managerRoutes.js";
 import propertyRoutes from "./routes/propertyRoutes.js";
+import leaseRoutes from "./routes/leaseRoutes.js";
 
 // ROUTE IMPORT
 
@@ -26,6 +27,7 @@ app.get("/", (_req, res) => {
   res.send("This is home route");
 });
 app.use("/properties", propertyRoutes);
+app.use("/leases", leaseRoutes);
 
 // PROTECTED ROUTES
 app.use("/tenants", authMiddleware(["tenant"]), tenantRoutes);

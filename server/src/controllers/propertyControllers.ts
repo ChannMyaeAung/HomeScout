@@ -245,6 +245,7 @@ export const createProperty = async (
       .filter((url): url is string => url !== undefined);
 
     // Nominatim (OpenStreetMap) converts a street address into lat/lng coordinates.
+    // These coordinates get stored in PostGIS so the distance search can work later.
     // A real User-Agent is required — Nominatim blocks generic or empty agents.
     const geocodingUrl = `https://nominatim.openstreetmap.org/search?${new URLSearchParams(
       {
@@ -273,7 +274,11 @@ export const createProperty = async (
         : [0, 0];
 
     // Raw INSERT required: Prisma cannot write PostGIS geography values via its ORM.
+    // Raw SQL with ST_SetSRID(ST_MakePoint(lng, lat), 4326) is the only way.
     // ST_MakePoint(lng, lat) note: longitude is x-axis, latitude is y-axis.
+    // RETURNING at the end gives back the newly inserted row immediately
+    // so we get the id for the next step
+    // without a second query.
     const [location] = await prisma.$queryRaw<Location[]>`
       INSERT INTO "Location" (address, city, state, country, "postalCode", coordinates)
       VALUES (

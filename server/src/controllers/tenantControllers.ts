@@ -152,7 +152,8 @@ export const addFavoriteProperty = async (
     const existingFavorites = tenant?.favorites ?? [];
 
     // Array.some() returns true as soon as it finds one element that matches the
-    // condition — here, "does any saved favorite already have this propertyId?"
+    // condition
+    // here, "does any saved favorite already have this propertyId?"
     // Checking before the write lets us return a clean 409 Conflict instead of
     // letting a DB constraint violation bubble up as a raw 500 error.
     if (existingFavorites.some((fav) => fav.id === propertyIdNumber)) {
@@ -161,7 +162,8 @@ export const addFavoriteProperty = async (
     }
 
     // `connect` is Prisma's API for linking two existing records in a many-to-many
-    // relation. It does NOT create a new Property — it inserts one row into the
+    // relation. It does NOT create a new Property
+    // it inserts one row into the
     // hidden join table (_TenantFavorites) that maps this tenant to that property.
     const updatedTenant = await prisma.tenant.update({
       where: { cognitoId },

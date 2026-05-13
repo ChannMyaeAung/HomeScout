@@ -31,3 +31,31 @@ export const createNewUserInDatabase = async (
 
   return createUserResponse;
 };
+
+// Strips filter fields that represent "no selection" before they are sent as
+// query params. Redux state always has a value for every field, so without this
+// step the API would receive noise like `beds=any` or `priceRange=null,null`.
+export function cleanParams(params: Record<string, any>): Record<string, any> {
+  return Object.fromEntries(
+    Object.entries(params).filter(
+      ([_, value]) =>
+        value !== undefined &&
+        value !== "any" && // dropdown sentinel: user picked nothing
+        value !== "" &&
+        // For tuple ranges [min, max]: keep only if at least one bound is set.
+        // For scalars: drop nulls.
+        (Array.isArray(value) ? value.some((v) => v !== null) : value !== null),
+    ),
+  );
+}
+
+export function formatPriceValue(value: number | null, isMin: boolean) {
+  if (value === null || value === 0) {
+    return isMin ? "Any Min Price" : "Any Max Price";
+  }
+  if (value >= 1000) {
+    const kValue = value / 1000;
+    return isMin ? `$${kValue}k+` : `<$${kValue}k`;
+  }
+  return isMin ? `$${value}+` : `<$${value}`;
+}

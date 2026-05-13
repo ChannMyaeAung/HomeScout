@@ -102,6 +102,7 @@ export const getManagerProperties = async (
     // NOTE: this is an N+1 pattern (1 extra query per property). Acceptable for
     // a manager's own listings which are typically few, but worth consolidating
     // into a single raw JOIN query if the list grows large.
+    // Promise.all ensures we wait for all async operations to complete before sending the response.
     const propertiesWithFormattedLocation = await Promise.all(
       properties.map(async (property) => {
         // ST_AsText converts the PostGIS geography column to WKT format, which is a text representation of the geometry.
@@ -126,11 +127,9 @@ export const getManagerProperties = async (
 
     res.json(propertiesWithFormattedLocation);
   } catch (error: any) {
-    res
-      .status(500)
-      .json({
-        message: "Error fetching manager properties",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Error fetching manager properties",
+      error: error.message,
+    });
   }
 };

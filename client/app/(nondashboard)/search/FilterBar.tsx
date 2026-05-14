@@ -23,6 +23,7 @@ import {
 import { PropertyTypeIcons } from "@/lib/constants";
 
 const FiltersBar = () => {
+  // Hooks
   const dispatch = useDispatch();
   const router = useRouter();
   const pathname = usePathname();
@@ -33,20 +34,28 @@ const FiltersBar = () => {
   const viewMode = useAppSelector((state) => state.global.viewMode);
   const [searchInput, setSearchInput] = useState(filters.location);
 
+  // Functions
+  // Debounced to avoid pushing a new browser history entry on every render cycle.
   const updateURL = debounce((newFilters: FiltersState) => {
     const cleanFilters = cleanParams(newFilters);
+    // URLSearchParams handles encoding automatically (spaces, special chars, etc.)
     const updatedSearchParams = new URLSearchParams();
 
     Object.entries(cleanFilters).forEach(([key, value]) => {
+      // URL params must be strings — arrays like [500, 2000] become "500,2000".
       updatedSearchParams.set(
         key,
         Array.isArray(value) ? value.join(",") : value.toString(),
       );
     });
 
+    // router.push adds a history entry so the back button undoes the filter change.
+    // router.replace would overwrite it, skipping the search page on back navigation.
     router.push(`${pathname}?${updatedSearchParams.toString()}`);
   });
 
+  // isMin is boolean for range fields (true = min bound, false = max bound)
+  // and null for every other field type that doesn't have a min/max concept.
   const handleFilterChange = (
     key: string,
     value: any,
@@ -55,9 +64,12 @@ const FiltersBar = () => {
     let newValue = value;
 
     if (key === "priceRange" || key === "squareFeet") {
+      // These are [min, max] tuples — the UI changes one end at a time.
+      // Spread to avoid mutating the Redux state object directly.
       const currentArrayRange = [...filters[key]];
       if (isMin !== null) {
         const index = isMin ? 0 : 1;
+        // "any" from the select means "no bound" — stored as null in the tuple.
         currentArrayRange[index] = value === "any" ? null : Number(value);
       }
       newValue = currentArrayRange;
@@ -67,6 +79,7 @@ const FiltersBar = () => {
       newValue = value === "any" ? "any" : value;
     }
 
+    // Update Redux (re-renders UI immediately) and the URL (preserves browser history).
     const newFilters = { ...filters, [key]: newValue };
     dispatch(setFilters(newFilters));
     updateURL(newFilters);
@@ -74,6 +87,8 @@ const FiltersBar = () => {
 
   const handleLocationSearch = async () => {
     try {
+      // Mapbox Geocoding API converts the typed address into [lng, lat] coordinates.
+      // fuzzyMatch=true tolerates typos so "Los Angelos" still resolves correctly.
       const response = await fetch(
         `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
           searchInput,
@@ -83,7 +98,10 @@ const FiltersBar = () => {
       );
       const data = await response.json();
       if (data.features && data.features.length > 0) {
+        // GeoJSON center is [longitude, latitude] note the reversed order vs. GPS convention.
         const [lng, lat] = data.features[0].center;
+        // Both fields must update together: location drives the search input label,
+        // coordinates drive the map and the proximity filter sent to the API.
         dispatch(
           setFilters({
             location: searchInput,
@@ -96,6 +114,7 @@ const FiltersBar = () => {
     }
   };
 
+  // Render
   return (
     <div className="flex justify-between items-center w-full py-5">
       {/* Filters */}
@@ -119,12 +138,11 @@ const FiltersBar = () => {
             placeholder="Search location"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="w-40 rounded-l-xl rounded-r-none border-primary-400 border-r-0"
+            className="w-40 rounded-none rounded-l-xl border-primary-400 border-r-0"
           />
           <Button
             onClick={handleLocationSearch}
-            className={`rounded-r-xl rounded-l-none border-l-none border-primary-400 shadow-none 
-              border hover:bg-primary-700 hover:text-primary-50`}
+            className="rounded-none rounded-r-xl border-primary-400 shadow-none border hover:bg-primary-700 hover:text-primary-50"
           >
             <Search className="w-4 h-4" />
           </Button>
@@ -132,8 +150,9 @@ const FiltersBar = () => {
 
         {/* Price Range */}
         <div className="flex gap-1">
-          {/* Minimum Price Selector */}
+          {/* Minimum Price Selector — isMin=true patches index 0 of the [min,max] tuple */}
           <Select
+            // Select needs a string value; null would break the controlled input, so fall back to "any".
             value={filters.priceRange[0]?.toString() || "any"}
             onValueChange={(value) =>
               handleFilterChange("priceRange", value, true)
@@ -154,7 +173,7 @@ const FiltersBar = () => {
             </SelectContent>
           </Select>
 
-          {/* Maximum Price Selector */}
+          {/* Maximum Price Selector — isMin=false patches index 1 of the [min,max] tuple */}
           <Select
             value={filters.priceRange[1]?.toString() || "any"}
             onValueChange={(value) =>
@@ -227,7 +246,7 @@ const FiltersBar = () => {
             <SelectItem value="any">Any Property Type</SelectItem>
             {Object.entries(PropertyTypeIcons).map(([type, Icon]) => (
               <SelectItem key={type} value={type}>
-                <div className="flex items-center">
+                <div className="flex items-center gap-1">
                   <Icon className="w-4 h-4 mr-2" />
                   <span>{type}</span>
                 </div>

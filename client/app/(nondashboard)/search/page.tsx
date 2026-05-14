@@ -3,6 +3,7 @@ import { NAVBAR_HEIGHT } from "@/lib/constants";
 import { useAppDispatch, useAppSelector } from "@/state/redux";
 import { useSearchParams } from "next/navigation";
 import FilterBar from "./FilterBar";
+import FiltersFull from "./FiltersFull";
 
 const SearchPage = () => {
   const searchParams = useSearchParams();
@@ -13,10 +14,9 @@ const SearchPage = () => {
 
   return (
     <div
-      className="w-full mx-auto px-5 flex flex-col"
+      className="w-full mx-auto px-5 flex flex-col py-3"
       style={{
         height: `calc(100vh - ${NAVBAR_HEIGHT}px)`,
-        marginTop: `${NAVBAR_HEIGHT}px`,
       }}
     >
       <FilterBar />
@@ -25,7 +25,7 @@ const SearchPage = () => {
         <div
           className={`h-full overflow-auto transition-all duration-300 ease-in-out ${isFiltersFullOpen ? "w-3/12 opacity-100 visible" : "w-0 opacity-0 invisible"}`}
         >
-          {/* <FiltersFull/> */}
+          <FiltersFull />
         </div>
         {/* <Map/> */}
         <div className="basis-4/12 overflow-y-auto">{/* <Listings/> */}</div>

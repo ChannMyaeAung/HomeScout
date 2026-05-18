@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -8,16 +9,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { PropertyTypeIcons } from "@/lib/constants";
-import { cleanParams, cn } from "@/lib/utils";
+import { AmenityIcons, PropertyTypeIcons } from "@/lib/constants";
+import { cleanParams, cn, formatEnumString } from "@/lib/utils";
 import { FiltersState, initialState, setFilters } from "@/state";
 import { useAppSelector } from "@/state/redux";
 import { debounce } from "lodash";
 import { Search } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
 
+/**
+ * Expanded filter panel rendered beside the search map.
+ * Maintains its own local draft state so changes don't affect the live
+ * search until the user explicitly hits "Apply".
+ */
 const FiltersFull = () => {
   const dispatch = useDispatch();
   const router = useRouter();
@@ -27,6 +33,7 @@ const FiltersFull = () => {
     (state) => state.global.isFiltersFullOpen,
   );
 
+  // Draft state — isolated from Redux until the user submits.
   const [localFilters, setLocalFilters] = useState(initialState.filters);
 
   const updateURL = debounce((newFilters: FiltersState) => {
@@ -54,7 +61,9 @@ const FiltersFull = () => {
     updateURL(initialState.filters);
   };
 
+  // Receives an amenity (e.g. "Wifi", "Pool" etc) and toggles it in the local filter state.
   const handleAmenityChange = (amenity: AmenityEnum) => {
+    // If the amenity is already in the list, remove it; otherwise add it.
     setLocalFilters((prev) => ({
       ...prev,
       amenities: prev.amenities.includes(amenity)
@@ -142,7 +151,7 @@ const FiltersFull = () => {
           <h4 className="font-bold mb-2">Price Range (Monthly)</h4>
           <Slider
             min={0}
-            max={1000}
+            max={10000}
             step={100}
             value={[
               localFilters.priceRange[0] ?? 0,
@@ -230,6 +239,64 @@ const FiltersFull = () => {
             <span>{localFilters.squareFeet[0] ?? 0} sq ft</span>
             <span>{localFilters.squareFeet[1] ?? 5000} sq ft</span>
           </div>
+        </div>
+
+        {/* Amenities */}
+        <div>
+          <h4 className="font-bold mb-2">Amenities</h4>
+          <div className="flex flex-wrap gap-2">
+            {Object.entries(AmenityIcons).map(([amenity, Icon]) => (
+              <div
+                key={amenity}
+                className={cn(
+                  "flex items-center space-x-2 p-2 border rounded-lg hover:cursor-pointer",
+                  localFilters.amenities.includes(amenity as AmenityEnum)
+                    ? "border-black"
+                    : "border-gray-200",
+                )}
+                onClick={() => handleAmenityChange(amenity as AmenityEnum)}
+              >
+                <Icon className="w-5 h-5 hover:cursor-pointer" />
+                <Label>{formatEnumString(amenity)}</Label>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Available From */}
+        <div>
+          <h4 className="font-bold mb-2">Available From</h4>
+          <Input
+            type="date"
+            value={
+              localFilters.availableFrom !== "any"
+                ? localFilters.availableFrom
+                : ""
+            }
+            onChange={(e) =>
+              setLocalFilters((prev) => ({
+                ...prev,
+                availableFrom: e.target.value ? e.target.value : "any",
+              }))
+            }
+          />
+        </div>
+
+        {/* Apply and Reset buttons */}
+        <div className="flex gap-4 mt-6">
+          <Button
+            onClick={handleSubmit}
+            className="flex-1 bg-primary-700 text-white rounded-xl"
+          >
+            APPLY
+          </Button>
+          <Button
+            onClick={handleReset}
+            variant={"outline"}
+            className="flex-1 rounded-xl"
+          >
+            Reset Filters
+          </Button>
         </div>
       </div>
     </div>

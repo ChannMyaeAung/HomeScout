@@ -1,7 +1,8 @@
-import { createNewUserInDatabase } from "@/lib/utils";
-import { Manager, Tenant } from "@/types/prisma/browser";
+import { cleanParams, createNewUserInDatabase, withToast } from "@/lib/utils";
+import { Manager, Property, Tenant } from "@/types/prisma/browser";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { fetchAuthSession, getCurrentUser } from "aws-amplify/auth";
+import { FiltersState } from ".";
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({
@@ -21,7 +22,7 @@ export const api = createApi({
     },
   }),
   reducerPath: "api",
-  tagTypes: ["Managers", "Tenants"],
+  tagTypes: ["Managers", "Tenants", "Properties"],
   endpoints: (build) => ({
     // Runs once after signing in to answer "who is this JWT user in our database?"
     // Reads the role from the JWT payload
@@ -95,11 +96,66 @@ export const api = createApi({
       },
       invalidatesTags: (result) => [{ type: "Managers", id: result?.id }],
     }),
+
+    // property related endpoints
+    getProperties: build.query<
+      Property[],
+      Partial<FiltersState> & { favoriteIds?: number[] }
+    >({
+      // query builds the HTTP request
+      // takes the filters, strips out any empty/null values via cleanParams
+      // then sends a GET /properties?location=... request
+      // The params obj is automatically serialized
+      // into query string params by RTK Query
+      query: (filters) => {
+        const params = cleanParams({
+          location: filters.location,
+          priceMin: filters.priceRange?.[0],
+          priceMax: filters.priceRange?.[1],
+          beds: filters.beds,
+          baths: filters.baths,
+          propertyType: filters.propertyType,
+          squareFeetMin: filters.squareFeet?.[0],
+          squareFeetMax: filters.squareFeet?.[1],
+          amenities: filters.amenities?.join(","),
+          availableFrom: filters.availableFrom,
+          favoriteIds: filters.favoriteIds?.join(","),
+          latitude: filters.coordinates?.[1],
+          longitude: filters.coordinates?.[0],
+        });
+        return { url: "properties", params };
+      },
+
+      // cache tagging
+      // tells RTK Query what the data represens in the cache
+      // {type: "Properties", id: 123}
+      // If property 123 is later mutated, a mutation can invalidate this tag, which tells RTK Query to refetch any queries that provided this tag
+      // If result is undefined (request failed)
+      // it still registers "LIST" so future invalidations still work
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.map(({ id }) => ({ type: "Properties" as const, id })),
+              { type: "Properties", id: "LIST" },
+            ]
+          : [{ type: "Properties", id: "LIST" }],
+
+      // side effect on error
+      // Hooks into the request lifecycle
+      // queryFulfilled is a promise that resolves on success and rejects on error
+      // withToast is a utility that shows a toast notification based on the promise result
+      async onQueryStarted(_, { queryFulfilled }) {
+        await withToast(queryFulfilled, {
+          error: "Failed to fetch properties",
+        });
+      },
+    }),
   }),
 });
 
 export const {
   useGetAuthUserQuery,
+  useGetPropertiesQuery,
   useUpdateTenantSettingsMutation,
   useUpdateManagerSettingsMutation,
 } = api;

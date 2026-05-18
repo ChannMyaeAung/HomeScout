@@ -2,6 +2,10 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+/* Force-generate the full primary and secondary colour scales so dynamic
+   class names in conditional expressions are never silently dropped. */
+@source inline("{text,bg,border,ring,fill,stroke}-{primary,secondary}-{50,100,200,300,400,500,600,700,800,900,950}");
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

@@ -87,19 +87,14 @@ const FiltersBar = () => {
 
   const handleLocationSearch = async () => {
     try {
-      // Mapbox Geocoding API converts the typed address into [lng, lat] coordinates.
-      // fuzzyMatch=true tolerates typos so "Los Angelos" still resolves correctly.
       const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+        `https://api.mapbox.com/search/geocode/v6/forward?q=${encodeURIComponent(
           searchInput,
-        )}.json?access_token=${
-          process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
-        }&fuzzyMatch=true`,
+        )}&access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}`,
       );
       const data = await response.json();
       if (data.features && data.features.length > 0) {
-        // GeoJSON center is [longitude, latitude] note the reversed order vs. GPS convention.
-        const [lng, lat] = data.features[0].center;
+        const [lng, lat] = data.features[0].geometry.coordinates;
         // Both fields must update together: location drives the search input label,
         // coordinates drive the map and the proximity filter sent to the API.
         dispatch(

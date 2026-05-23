@@ -75,11 +75,11 @@ const FiltersFull = () => {
   const handleLocationSearch = async () => {
     try {
       const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(localFilters.location)}.json?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}&fuzzyMatch=true`,
+        `https://api.mapbox.com/search/geocode/v6/forward?q=${encodeURIComponent(localFilters.location)}&access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}`,
       );
       const data = await response.json();
       if (data.features && data.features.length > 0) {
-        const [lng, lat] = data.features[0].center;
+        const [lng, lat] = data.features[0].geometry.coordinates;
         setLocalFilters((prev) => ({
           ...prev,
           coordinates: [lat, lng],

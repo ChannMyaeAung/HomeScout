@@ -22,7 +22,7 @@ export const api = createApi({
     },
   }),
   reducerPath: "api",
-  tagTypes: ["Managers", "Tenants", "Properties"],
+  tagTypes: ["Managers", "Tenants", "Properties", "PropertyDetails"],
   endpoints: (build) => ({
     // Runs once after signing in to answer "who is this JWT user in our database?"
     // Reads the role from the JWT payload
@@ -140,6 +140,16 @@ export const api = createApi({
       },
     }),
 
+    getProperty: build.query<Property, number>({
+      query: (id) => `properties/${id}`,
+      providesTags: (result, error, id) => [{ type: "PropertyDetails", id }],
+      async onQueryStarted(_, { queryFulfilled }) {
+        await withToast(queryFulfilled, {
+          error: "Failed to load property details",
+        });
+      },
+    }),
+
     // tenant related endpoints
     getTenant: build.query<Tenant, string>({
       query: (cognitoId) => `tenants/${cognitoId}`,
@@ -213,6 +223,7 @@ export const api = createApi({
 export const {
   useGetAuthUserQuery,
   useGetPropertiesQuery,
+  useGetPropertyQuery,
   useUpdateTenantSettingsMutation,
   useUpdateManagerSettingsMutation,
   useGetTenantQuery,

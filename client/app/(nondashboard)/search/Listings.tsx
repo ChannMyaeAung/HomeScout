@@ -9,6 +9,8 @@ import { useAppSelector } from "@/state/redux";
 import { Property } from "@/types/prisma/browser";
 import Card from "@/components/Card";
 import CardCompact from "@/components/CardCompact";
+import Loading from "@/components/Loading";
+import ErrorComponent from "@/components/ErrorComponent";
 
 const Listings = () => {
   const { data: authUser } = useGetAuthUserQuery();
@@ -49,8 +51,8 @@ const Listings = () => {
     }
   };
 
-  if (isLoading) return <>Loading...</>;
-  if (isError || !properties) return <div>Failed to fetch properties</div>;
+  if (isLoading) return <Loading fullPage={false} />;
+  if (isError || !properties) return <ErrorComponent message="Failed to fetch properties." fullPage={false} />;
 
   return (
     <div className="w-full">

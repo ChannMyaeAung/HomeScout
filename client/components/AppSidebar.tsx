@@ -104,12 +104,12 @@ const AppSidebar = ({ userType }: AppSidebarProps) => {
                   className={cn(
                     "flex items-center px-6 py-6",
                     isActive
-                      ? "bg-blue-100! text-blue-600!"
+                      ? "bg-blue-100! text-blue-600! rounded-none"
                       : "text-gray-600 hover:bg-gray-100",
-                    !open && "ml-1.25",
+                    !open && "ml-1.25 ",
                   )}
                 >
-                  <Link href={link.href} className="w-full" scroll={false}>
+                  <Link href={link.href} className="w-full " scroll={false}>
                     <div className="flex items-center gap-3">
                       <link.icon
                         className={`h-5 w-5 ${

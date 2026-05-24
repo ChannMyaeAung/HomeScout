@@ -1,5 +1,7 @@
 import { useGetPropertyQuery } from "@/state/api";
 import { MapPin, Star } from "lucide-react";
+import Loading from "@/components/Loading";
+import ErrorComponent from "@/components/ErrorComponent";
 
 const PropertyOverview = ({ propertyId }: PropertyOverviewProps) => {
   const {
@@ -8,8 +10,8 @@ const PropertyOverview = ({ propertyId }: PropertyOverviewProps) => {
     isLoading,
   } = useGetPropertyQuery(propertyId);
 
-  if (isLoading) return <>Loading...</>;
-  if (isError || !property) return <>Property not Found</>;
+  if (isLoading) return <Loading fullPage={false} />;
+  if (isError || !property) return <ErrorComponent message="Property not found." fullPage={false} />;
   return (
     <div>
       {/* Header */}

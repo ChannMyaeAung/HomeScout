@@ -1,5 +1,6 @@
 "use client";
 import Navbar from "@/components/Navbar";
+import Loading from "@/components/Loading";
 import { NAVBAR_HEIGHT } from "@/lib/constants";
 import { useGetAuthUserQuery } from "@/state/api";
 import { usePathname, useRouter } from "next/navigation";
@@ -26,7 +27,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     }
   }, [isManagerOnWrongRoute, router]);
 
-  if (authLoading || isManagerOnWrongRoute) return <>Loading...</>;
+  if (authLoading || isManagerOnWrongRoute) return <Loading />;
 
   return (
     <div className="h-full w-full">

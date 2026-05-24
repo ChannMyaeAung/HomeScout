@@ -68,7 +68,7 @@ const Navbar = () => {
           {isDashboardPage && authUser && (
             <Button
               variant={"secondary"}
-              className="md:ml-4 bg-primary-50 text-primary-700 hover:bg-secondary-500 hover:text-primary-50"
+              className="md:ml-4 bg-primary-50 text-primary-700 hover:bg-secondary-500 hover:text-primary-50 rounded-sm "
               onClick={() =>
                 router.push(
                   authUser.userRole?.toLowerCase() === "manager"
@@ -130,7 +130,10 @@ const Navbar = () => {
                   </p>
                 </DropdownMenuTrigger>
 
-                <DropdownMenuContent className="bg-white text-primary-700">
+                <DropdownMenuContent
+                  align="end"
+                  className="bg-white text-primary-700 rounded-md"
+                >
                   <DropdownMenuItem
                     className="cursor-pointer hover:bg-primary-700! hover:text-primary-100! font-bold"
                     onClick={() =>

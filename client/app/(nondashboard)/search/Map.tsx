@@ -1,10 +1,12 @@
 "use client";
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useAppSelector } from "@/state/redux";
 import { useGetPropertiesQuery } from "@/state/api";
 import { Property } from "@/types/prisma/browser";
+import Loading from "@/components/Loading";
+import ErrorComponent from "@/components/ErrorComponent";
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN as string;
 
@@ -43,8 +45,8 @@ const Map = () => {
     return () => map.remove();
   }, [isLoading, isError, properties, filters.coordinates]);
 
-  if (isLoading) return <>Loading...</>;
-  if (isError || !properties) return <div>Failed to fetch properties</div>;
+  if (isLoading) return <Loading fullPage={false} />;
+  if (isError || !properties) return <ErrorComponent message="Failed to load map data." fullPage={false} />;
 
   return (
     <div className="basis-5/12 grow relative rounded-xl">

@@ -3,7 +3,8 @@ import { AmenityIcons, HighlightIcons } from "@/lib/constants";
 import { formatEnumString } from "@/lib/utils";
 import { useGetPropertyQuery } from "@/state/api";
 import { HelpCircle } from "lucide-react";
-import React from "react";
+import Loading from "@/components/Loading";
+import ErrorComponent from "@/components/ErrorComponent";
 
 const PropertyDetails = ({ propertyId }: PropertyDetailsProps) => {
   const {
@@ -12,8 +13,8 @@ const PropertyDetails = ({ propertyId }: PropertyDetailsProps) => {
     isLoading,
   } = useGetPropertyQuery(propertyId);
 
-  if (isLoading) return <>Loading...</>;
-  if (isError || !property) return <>Failed to load property details.</>;
+  if (isLoading) return <Loading fullPage={false} />;
+  if (isError || !property) return <ErrorComponent message="Failed to load property details." fullPage={false} />;
 
   return (
     <div className="mb-6">

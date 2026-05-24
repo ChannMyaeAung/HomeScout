@@ -1,5 +1,6 @@
 "use client";
 import Navbar from "@/components/Navbar";
+import Loading from "@/components/Loading";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import Sidebar from "@/components/AppSidebar";
 import { NAVBAR_HEIGHT } from "@/lib/constants";
@@ -27,7 +28,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     }
   }, [isOnWrongRoute, userRole, router]);
 
-  if (authLoading || isOnWrongRoute) return <>Loading...</>;
+  if (authLoading || isOnWrongRoute) return <Loading />;
 
   if (!authUser?.userRole) return null;
 

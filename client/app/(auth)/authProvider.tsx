@@ -11,6 +11,7 @@ import {
   View,
 } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
+import { fetchAuthSession, signOut } from "aws-amplify/auth";
 import { usePathname, useRouter } from "next/navigation";
 
 Amplify.configure({
@@ -152,11 +153,18 @@ const Auth = ({ children }: { children: React.ReactNode }) => {
 
   const isAuthPage = pathname.match(/^\/(signin|signup)$/);
   const isDashboardPage =
-    pathname.startsWith("/manager") || pathname.startsWith("/tenants");
+    pathname.startsWith("/managers") || pathname.startsWith("/tenants");
+
+  // If Amplify has a cached session but the Cognito account no longer exists,
+  // force-refresh the token. On failure, sign out to clear the stale session.
+  useEffect(() => {
+    if (!user) return;
+    fetchAuthSession({ forceRefresh: true }).catch(() => signOut());
+  }, [user]);
 
   useEffect(() => {
     if (user && isAuthPage) {
-      router.push("/"); // Redirect to home page after sign in/up
+      router.push("/");
     }
   }, [user, isAuthPage, router]);
 

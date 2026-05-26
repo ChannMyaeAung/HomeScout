@@ -1,6 +1,7 @@
 "use client";
 
 import Card from "@/components/Card";
+import ErrorComponent from "@/components/ErrorComponent";
 import Header from "@/components/Header";
 import Loading from "@/components/Loading";
 import {
@@ -25,7 +26,7 @@ const Residences = () => {
   });
 
   if (isLoading) return <Loading />;
-  if (error) return <div>Error loading current residences</div>;
+  if (error) return <ErrorComponent />;
 
   return (
     <div className="dashboard-container">

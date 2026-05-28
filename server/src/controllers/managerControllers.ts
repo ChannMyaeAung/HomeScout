@@ -29,8 +29,8 @@ export const getManager = async (
 };
 
 export const createManager = async (
-  res: Response,
   req: Request,
+  res: Response,
 ): Promise<void> => {
   try {
     const { cognitoId, name, email, phoneNumber } = req.body;

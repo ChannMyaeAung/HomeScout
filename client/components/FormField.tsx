@@ -79,7 +79,8 @@ export const CustomFormField: React.FC<FormFieldProps> = ({
           <Textarea
             placeholder={placeholder}
             {...field}
-            rows={3}
+            rows={6}
+            cols={6}
             className={`border-gray-200 p-4 ${inputClassName}`}
           />
         );
@@ -91,16 +92,16 @@ export const CustomFormField: React.FC<FormFieldProps> = ({
             onValueChange={field.onChange}
           >
             <SelectTrigger
-              className={`w-full border-gray-200 p-4 ${inputClassName}`}
+              className={`w-full border-gray-200 rounded-sm p-4 ${inputClassName}`}
             >
               <SelectValue placeholder={placeholder} />
             </SelectTrigger>
-            <SelectContent className="w-full border-gray-200 shadow">
+            <SelectContent className="w-full border-gray-200 rounded-sm shadow">
               {options?.map((option) => (
                 <SelectItem
                   key={option.value}
                   value={option.value}
-                  className="cursor-pointer hover:bg-gray-100! hover:text-customgreys-darkGrey!"
+                  className="cursor-pointer hover:bg-gray-100! hover:text-customgreys-darkGrey! rounded-sm"
                 >
                   {option.label}
                 </SelectItem>

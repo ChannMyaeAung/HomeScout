@@ -1,5 +1,6 @@
 import { cleanParams, createNewUserInDatabase, withToast } from "@/lib/utils";
 import {
+  Application,
   Lease,
   Manager,
   Payment,
@@ -35,6 +36,7 @@ export const api = createApi({
     "PropertyDetails",
     "Leases",
     "Payments",
+    "Applications",
   ],
   endpoints: (build) => ({
     // Runs once after signing in to answer "who is this JWT user in our database?"
@@ -312,6 +314,47 @@ export const api = createApi({
         });
       },
     }),
+
+    // application related endpoints
+    getApplications: build.query<
+      Application[],
+      { userId?: string; userType?: string }
+    >({
+      query: (params) => {
+        const queryParams = new URLSearchParams();
+        if (params.userId) {
+          queryParams.append("userId", params.userId.toString());
+        }
+        if (params.userType) {
+          queryParams.append("userType", params.userType);
+        }
+        return `applications?${queryParams.toString()}`;
+      },
+      providesTags: ["Applications"],
+      async onQueryStarted(_, { queryFulfilled }) {
+        await withToast(queryFulfilled, {
+          error: "Failed to fetch applications.",
+        });
+      },
+    }),
+
+    updateApplicationStatus: build.mutation<
+      Application & { lease?: Lease },
+      { id: number; status: string }
+    >({
+      query: ({ id, status }) => ({
+        url: `applications/${id}/status`,
+        method: "PUT",
+        body: { status },
+      }),
+      invalidatesTags: ["Applications", "Leases"],
+      async onQueryStarted(_, { queryFulfilled }) {
+        await withToast(queryFulfilled, {
+          success: "Application status updated!",
+          error: "Failed to update application status.",
+        });
+      },
+    }),
   }),
 });
 
@@ -330,4 +373,6 @@ export const {
   useGetTenantQuery,
   useAddFavoritePropertyMutation,
   useRemoveFavoritePropertyMutation,
+  useGetApplicationsQuery,
+  useUpdateApplicationStatusMutation,
 } = api;

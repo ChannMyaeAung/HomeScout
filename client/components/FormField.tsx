@@ -81,7 +81,7 @@ export const CustomFormField: React.FC<FormFieldProps> = ({
             {...field}
             rows={6}
             cols={6}
-            className={`border-gray-200 p-4 ${inputClassName}`}
+            className={`border-gray-200 p-4 rounded-md ${inputClassName}`}
           />
         );
       case "select":
@@ -160,7 +160,7 @@ export const CustomFormField: React.FC<FormFieldProps> = ({
             type={type}
             placeholder={placeholder}
             {...field}
-            className={`border-gray-200 py-6 px-4 ${inputClassName}`}
+            className={`border-gray-200 py-6 px-4  ${inputClassName}`}
             disabled={disabled}
           />
         );
@@ -175,7 +175,7 @@ export const CustomFormField: React.FC<FormFieldProps> = ({
       render={({ field, fieldState: { error } }) => (
         <Field
           data-invalid={!!error}
-          className={`${type !== "switch" ? "rounded-md" : ""} relative space-y-6 ${className}`}
+          className={`${type !== "switch" ? "rounded-md" : ""} relative space-y-6 gap-0 ${className}`}
         >
           {type !== "switch" && (
             <div className="flex items-center justify-between space-x-6">

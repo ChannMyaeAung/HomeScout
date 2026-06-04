@@ -190,7 +190,9 @@ export const updateApplicationStatus = async (
       const newLease = await prisma.lease.create({
         data: {
           startDate: new Date(),
-          endDate: new Date(new Date().getFullYear() + 1),
+          endDate: new Date(
+            new Date().setFullYear(new Date().getFullYear() + 1),
+          ),
           rent: application.property.pricePerMonth,
           deposit: application.property.securityDeposit,
           propertyId: application.propertyId,
@@ -198,7 +200,6 @@ export const updateApplicationStatus = async (
         },
       });
 
-      // Update the property to connect the tenant
       await prisma.property.update({
         where: { id: application.propertyId },
         data: {
@@ -208,8 +209,7 @@ export const updateApplicationStatus = async (
         },
       });
 
-      // Update the application with the new lease ID
-      await prisma.application.update({
+      const updatedApplication = await prisma.application.update({
         where: { id: Number(id) },
         data: { status, leaseId: newLease.id },
         include: {
@@ -218,14 +218,14 @@ export const updateApplicationStatus = async (
           lease: true,
         },
       });
+
+      res.json(updatedApplication);
     } else {
-      // Update the application status (for both "Denied" and other statuses)
       await prisma.application.update({
         where: { id: Number(id) },
         data: { status },
       });
 
-      // Respond with the updated application details
       const updatedApplication = await prisma.application.findUnique({
         where: { id: Number(id) },
         include: {

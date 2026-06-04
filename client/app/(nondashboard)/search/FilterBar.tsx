@@ -118,7 +118,7 @@ const FiltersBar = () => {
         <Button
           variant="outline"
           className={cn(
-            "gap-2 rounded-xl border-primary-400 hover:bg-primary-500 hover:text-primary-100",
+            "gap-2 p-5 rounded-xl border-primary-400 hover:bg-primary-500 hover:text-primary-100",
             isFiltersFullOpen && "bg-primary-700 text-primary-100",
           )}
           onClick={() => dispatch(toggleFiltersFullOpen())}
@@ -128,19 +128,20 @@ const FiltersBar = () => {
         </Button>
 
         {/* Search Location */}
-        <div className="flex items-center">
+        <div className="flex items-center h-10">
           <Input
             placeholder="Search location"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="w-40 rounded-none rounded-l-xl border-primary-400 border-r-0"
+            className="h-9.5 w-40  rounded-none rounded-l-xl border-primary-400 border-r-0"
           />
-          <Button
+          <button
+            type="button"
             onClick={handleLocationSearch}
-            className="rounded-none rounded-r-xl border-primary-400 shadow-none border hover:bg-primary-700 hover:text-primary-50"
+            className="h-10 w-10 flex items-center justify-center rounded-none rounded-r-xl border border-primary-400 text-white bg-primary-700 hover:bg-white hover:text-primary-700 transition-colors cursor-pointer"
           >
             <Search className="w-4 h-4" />
-          </Button>
+          </button>
         </div>
 
         {/* Price Range */}

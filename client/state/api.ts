@@ -355,6 +355,21 @@ export const api = createApi({
         });
       },
     }),
+
+    createApplication: build.mutation<Application, Partial<Application>>({
+      query: (body) => ({
+        url: `applications`,
+        method: "POST",
+        body: body,
+      }),
+      invalidatesTags: ["Applications"],
+      async onQueryStarted(_, { queryFulfilled }) {
+        await withToast(queryFulfilled, {
+          success: "Application created successfully!",
+          error: "Failed to create application.",
+        });
+      },
+    }),
   }),
 });
 
@@ -375,4 +390,5 @@ export const {
   useRemoveFavoritePropertyMutation,
   useGetApplicationsQuery,
   useUpdateApplicationStatusMutation,
+  useCreateApplicationMutation,
 } = api;

@@ -98,7 +98,7 @@ const FiltersFull = () => {
         {/* Location */}
         <div>
           <h4 className="font-bold mb-2">Location</h4>
-          <div className="flex items-center">
+          <div className="flex items-center h-10">
             <Input
               placeholder="Enter location"
               value={localFilters.location}
@@ -108,14 +108,15 @@ const FiltersFull = () => {
                   location: e.target.value,
                 }))
               }
-              className="rounded-none rounded-l-xl border-r-0"
+              className="h-10 rounded-none rounded-l-xl border-r-0"
             />
-            <Button
+            <button
+              type="button"
               onClick={handleLocationSearch}
-              className="rounded-none rounded-r-xl border-black shadow-none border hover:bg-primary-700 hover:text-primary-50"
+              className="h-10 w-10 flex items-center justify-center rounded-none rounded-r-xl border border-gray-300 bg-white hover:bg-primary-700 hover:text-primary-50 transition-colors cursor-pointer"
             >
               <Search className="w-4 h-4" />
-            </Button>
+            </button>
           </div>
         </div>
 

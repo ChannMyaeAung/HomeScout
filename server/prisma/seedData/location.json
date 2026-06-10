@@ -88,5 +88,140 @@
     "address": "789 Rodeo Dr",
     "postalCode": "90210",
     "coordinates": "POINT(-118.400356 34.073620)"
+  },
+  {
+    "id": 11,
+    "country": "Thailand",
+    "city": "Bangkok",
+    "state": "Watthana",
+    "address": "88/1 Sukhumvit Soi 11",
+    "postalCode": "10110",
+    "coordinates": "POINT(100.555600 13.741100)"
+  },
+  {
+    "id": 12,
+    "country": "Thailand",
+    "city": "Bangkok",
+    "state": "Bang Rak",
+    "address": "12 Silom Road",
+    "postalCode": "10500",
+    "coordinates": "POINT(100.523600 13.723400)"
+  },
+  {
+    "id": 13,
+    "country": "Thailand",
+    "city": "Bangkok",
+    "state": "Watthana",
+    "address": "55 Thong Lo Soi 13",
+    "postalCode": "10110",
+    "coordinates": "POINT(100.584400 13.726400)"
+  },
+  {
+    "id": 14,
+    "country": "Thailand",
+    "city": "Bangkok",
+    "state": "Phaya Thai",
+    "address": "22/4 Phahon Yothin Soi 7",
+    "postalCode": "10400",
+    "coordinates": "POINT(100.544800 13.775700)"
+  },
+  {
+    "id": 15,
+    "country": "Thailand",
+    "city": "Bangkok",
+    "state": "Bang Rak",
+    "address": "333 Charoen Krung Road",
+    "postalCode": "10500",
+    "coordinates": "POINT(100.508800 13.723400)"
+  },
+  {
+    "id": 16,
+    "country": "Thailand",
+    "city": "Bangkok",
+    "state": "Chatuchak",
+    "address": "101 Phahon Yothin Road",
+    "postalCode": "10900",
+    "coordinates": "POINT(100.553100 13.802100)"
+  },
+  {
+    "id": 17,
+    "country": "Thailand",
+    "city": "Bangkok",
+    "state": "Huai Khwang",
+    "address": "68 Ratchadaphisek Road",
+    "postalCode": "10310",
+    "coordinates": "POINT(100.568300 13.769900)"
+  },
+  {
+    "id": 18,
+    "country": "Thailand",
+    "city": "Bangkok",
+    "state": "Watthana",
+    "address": "44 Ekkamai Soi 10",
+    "postalCode": "10110",
+    "coordinates": "POINT(100.586000 13.719800)"
+  },
+  {
+    "id": 19,
+    "country": "Thailand",
+    "city": "Bangkok",
+    "state": "Phra Khanong",
+    "address": "9/12 On Nut Soi 17",
+    "postalCode": "10260",
+    "coordinates": "POINT(100.601200 13.701800)"
+  },
+  {
+    "id": 20,
+    "country": "Thailand",
+    "city": "Chiang Mai",
+    "state": "Mueang Chiang Mai",
+    "address": "15 Nimmanhaemin Road Soi 9",
+    "postalCode": "50200",
+    "coordinates": "POINT(98.968000 18.795300)"
+  },
+  {
+    "id": 21,
+    "country": "Thailand",
+    "city": "Chiang Mai",
+    "state": "Mueang Chiang Mai",
+    "address": "33 Ratchadamnoen Road",
+    "postalCode": "50200",
+    "coordinates": "POINT(98.985300 18.788300)"
+  },
+  {
+    "id": 22,
+    "country": "Thailand",
+    "city": "Chiang Mai",
+    "state": "Mueang Chiang Mai",
+    "address": "7 Charoenrat Road",
+    "postalCode": "50000",
+    "coordinates": "POINT(99.004500 18.787600)"
+  },
+  {
+    "id": 23,
+    "country": "Thailand",
+    "city": "Phuket",
+    "state": "Kathu",
+    "address": "120/3 Rat-U-Thit 200 Pee Road",
+    "postalCode": "83150",
+    "coordinates": "POINT(98.297800 7.896100)"
+  },
+  {
+    "id": 24,
+    "country": "Thailand",
+    "city": "Phuket",
+    "state": "Mueang Phuket",
+    "address": "55 Kata Road",
+    "postalCode": "83100",
+    "coordinates": "POINT(98.299400 7.819900)"
+  },
+  {
+    "id": 25,
+    "country": "Thailand",
+    "city": "Phuket",
+    "state": "Mueang Phuket",
+    "address": "18 Thalang Road",
+    "postalCode": "83000",
+    "coordinates": "POINT(98.392300 7.880400)"
   }
 ]

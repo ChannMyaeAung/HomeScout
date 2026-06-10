@@ -133,7 +133,8 @@ const FiltersBar = () => {
             placeholder="Search location"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="h-9.5 w-40  rounded-none rounded-l-xl border-primary-400 border-r-0"
+            onKeyDown={(e) => e.key === "Enter" && handleLocationSearch()}
+            className="h-9.5 w-40 rounded-none rounded-l-xl border-primary-400 border-r-0"
           />
           <button
             type="button"

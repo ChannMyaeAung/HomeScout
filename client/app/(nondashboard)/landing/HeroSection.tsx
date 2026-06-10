@@ -26,7 +26,7 @@ const HeroSection = () => {
         )}&access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}`,
       );
       const data = await response.json();
-      console.log("geocode response:", data);
+
       if (data.features && data.features.length > 0) {
         const [lng, lat] = data.features[0].geometry.coordinates;
         dispatch(
@@ -81,6 +81,7 @@ const HeroSection = () => {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleLocationSearch()}
               placeholder="Search by city, neighborhood or address"
               className="w-full max-w-lg rounded-none rounded-l-xl border-none bg-white h-12"
             />

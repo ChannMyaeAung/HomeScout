@@ -34,7 +34,7 @@ async function insertLocationData(locations: any[]) {
     try {
       await prisma.$executeRaw`
         INSERT INTO "Location" ("id", "country", "city", "state", "address", "postalCode", "coordinates") 
-        VALUES (${id}, ${country}, ${city}, ${state}, ${address}, ${postalCode}, ST_GeomFromText(${coordinates}, 4326));
+        VALUES (${id}, ${country}, ${city}, ${state}, ${address}, ${postalCode}, public.ST_GeomFromText(${coordinates}, 4326));
       `;
       console.log(`Inserted location for ${city}`);
     } catch (error) {

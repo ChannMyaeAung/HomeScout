@@ -43,13 +43,23 @@ async function insertLocationData(locations: any[]) {
   }
 }
 
-const VALID_MODELS = ["location", "manager", "property", "tenant", "lease", "application", "payment"] as const;
-type ValidModel = typeof VALID_MODELS[number];
+const VALID_MODELS = [
+  "location",
+  "manager",
+  "property",
+  "tenant",
+  "lease",
+  "application",
+  "payment",
+] as const;
+type ValidModel = (typeof VALID_MODELS)[number];
 
 async function resetSequence(modelName: ValidModel) {
   const tableName = toPascalCase(modelName);
 
-  const maxIdResult = await (prisma[modelName as keyof PrismaClient] as any).findMany({
+  const maxIdResult = await (
+    prisma[modelName as keyof PrismaClient] as any
+  ).findMany({
     select: { id: true },
     orderBy: { id: "desc" },
     take: 1,
@@ -59,7 +69,7 @@ async function resetSequence(modelName: ValidModel) {
 
   const nextId = maxIdResult[0].id + 1;
   await prisma.$executeRawUnsafe(
-    `SELECT setval(pg_get_serial_sequence('"${tableName}"', 'id'), ${nextId}, false);`
+    `SELECT setval(pg_get_serial_sequence('"${tableName}"', 'id'), ${nextId}, false);`,
   );
   console.log(`Reset sequence for ${modelName} to ${nextId}`);
 }
@@ -127,9 +137,9 @@ async function main() {
     }
 
     // Reset the sequence after seeding each model
-    if (VALID_MODELS.includes(modelNameCamel as ValidModel)) {
-      await resetSequence(modelNameCamel as ValidModel);
-    }
+    // if (VALID_MODELS.includes(modelNameCamel as ValidModel)) {
+    //await resetSequence(modelNameCamel as ValidModel);
+    //}
 
     await sleep(1000);
   }

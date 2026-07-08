@@ -4,15 +4,14 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
+import { createPgPool } from "../src/lib/pgPool.js";
 
 dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const connectionString = process.env.DATABASE_URL;
-if (!connectionString) throw new Error("DATABASE_URL is not set in .env");
-
-const adapter = new PrismaPg({ connectionString });
+const pool = createPgPool();
+const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 function sleep(ms: number) {

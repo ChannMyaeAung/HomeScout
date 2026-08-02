@@ -16,12 +16,30 @@ import applicationRoutes from "./routes/applicationRoutes.js";
 // CONFIGURATION
 dotenv.config();
 const app = express();
-app.use(express.json());
+
+// Configure Helmet with CORS-friendly Cross-Origin Resource Policy
 app.use(helmet());
-app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
+app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" })); // Allows cross-origin resources
+
+app.use(express.json());
 app.use(morgan("common"));
 app.use(express.urlencoded({ extended: false }));
-app.use(cors());
+
+// Configure CORS explicitly for the Amplify Frontend
+app.use(
+  cors({
+    origin: "*",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-Amz-Date",
+      "X-Api-Key",
+      "X-Amz-Security-Token",
+    ],
+  }),
+);
 
 // ROUTES
 app.get("/", (_req, res) => {

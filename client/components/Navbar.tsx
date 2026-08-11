@@ -18,7 +18,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { SidebarTrigger } from "./ui/sidebar";
 
 const Navbar = () => {
-  const { data: authUser } = useGetAuthUserQuery();
+  const { data: authUser, isLoading } = useGetAuthUserQuery();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -103,7 +103,14 @@ const Navbar = () => {
 
         {/* Right side content */}
         <div className="flex items-center gap-5">
-          {authUser ? (
+          {isLoading ? (
+            /* Show loading skeleton while fetching auth state */
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-primary-600 animate-pulse" />
+              <div className="w-20 h-4 bg-primary-600 rounded animate-pulse hidden md:block" />
+            </div>
+          ) : authUser ? (
+            /* Authenticated User View */
             <>
               <div className="relative hidden md:block">
                 <MessageCircle className="w-6 h-6 cursor-pointer text-primary-200 hover:text-primary-400" />
@@ -171,6 +178,7 @@ const Navbar = () => {
               </DropdownMenu>
             </>
           ) : (
+            /* Unauthenticated View */
             <>
               <Link href={"/signin"}>
                 <Button

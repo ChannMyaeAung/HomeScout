@@ -1,18 +1,32 @@
 "use client";
 import React, { useEffect } from "react";
 import { Amplify } from "aws-amplify";
+import { I18n } from "aws-amplify/utils";
 
 import {
   Authenticator,
   Heading,
+  PasswordField,
   Radio,
   RadioGroupField,
+  TextField,
   useAuthenticator,
   View,
 } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import { fetchAuthSession, signOut } from "aws-amplify/auth";
 import { usePathname, useRouter } from "next/navigation";
+
+const usernameConstraintError =
+  "1 validation error detected: Value at 'username' failed to satisfy constraint: Member must satisfy regular expression pattern: [\\p{L}\\p{M}\\p{S}\\p{N}\\p{P}]+";
+const friendlyUsernameError =
+  "Choose a username using letters, numbers, spaces, or common symbols.";
+
+I18n.putVocabularies({
+  en: {
+    [usernameConstraintError]: friendlyUsernameError,
+  },
+});
 
 Amplify.configure({
   Auth: {
@@ -68,9 +82,72 @@ const components = {
   SignUp: {
     FormFields() {
       const { validationErrors } = useAuthenticator();
+      const signUpFields = [
+        {
+          name: "username",
+          label: "Username",
+          placeholder: "Choose a username",
+          autoComplete: "username",
+          isRequired: true,
+        },
+        {
+          name: "email",
+          label: "Email",
+          placeholder: "Enter your email",
+          autoComplete: "email",
+          isRequired: true,
+        },
+        {
+          name: "password",
+          label: "Password",
+          placeholder: "Enter your password",
+          autoComplete: "new-password",
+          type: "password" as const,
+          isRequired: true,
+        },
+        {
+          name: "confirm_password",
+          label: "Confirm Password",
+          placeholder: "Confirm your password",
+          autoComplete: "new-password",
+          type: "password" as const,
+          isRequired: true,
+        },
+      ];
+
+      const getFriendlyError = (error: unknown) => {
+        const message = Array.isArray(error) ? error[0] : error;
+
+        if (
+          typeof message === "string" &&
+          message.includes("'username'") &&
+          message.includes("failed to satisfy constraint")
+        ) {
+          return "Choose a username using letters, numbers, spaces, or common symbols.";
+        }
+
+        return message;
+      };
+
       return (
         <>
-          <Authenticator.SignUp.FormFields />
+          {signUpFields.map((field) => {
+            const errorMessage = getFriendlyError(
+              validationErrors?.[field.name],
+            );
+            const { type, ...fieldWithoutType } = field;
+            const fieldProps = {
+              ...fieldWithoutType,
+              errorMessage,
+              hasError: Boolean(errorMessage),
+            };
+
+            return type === "password" ? (
+              <PasswordField key={field.name} {...fieldProps} />
+            ) : (
+              <TextField key={field.name} {...fieldProps} />
+            );
+          })}
           <RadioGroupField
             legend="Role"
             name="custom:role"

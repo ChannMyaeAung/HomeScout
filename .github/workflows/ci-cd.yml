@@ -88,49 +88,10 @@ jobs:
             client/public
           retention-days: 1
 
-  build-server:
-    name: Build Server
-    needs: lint-and-typecheck
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Install server dependencies
-        run: pnpm install --frozen-lockfile
-        working-directory: ./server
-
-      - name: Generate Prisma Client
-        run: pnpm prisma:generate
-        working-directory: ./server
-
-      - name: Build server
-        run: pnpm build
-        working-directory: ./server
-
-      - name: Upload server build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: server-build
-          path: |
-            server/dist
-            server/prisma
-          retention-days: 1
-
   deploy-vercel:
     name: Deploy to Vercel
     needs: build-client
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push' && secrets.VERCEL_TOKEN != ''
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

@@ -50,7 +50,6 @@ const Residence = () => {
     <div className="dashboard-container">
       <div className="w-full mx-auto">
         <div className="md:flex gap-10">
-          '
           {currentLease && (
             <ResidenceCard property={property} currentLease={currentLease} />
           )}

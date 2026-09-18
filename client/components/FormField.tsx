@@ -6,8 +6,8 @@ import {
   useFormContext,
   useFieldArray,
   type ControllerRenderProps,
-  type FieldValues,
 } from "react-hook-form";
+import { Control, FieldValues } from "react-hook-form";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -202,10 +202,10 @@ export const CustomFormField: React.FC<FormFieldProps> = ({
     />
   );
 };
-
+ 
 interface MultiInputFieldProps {
   name: string;
-  control: any;
+  control: Control<FieldValues>;
   placeholder?: string;
   inputClassName?: string;
 }

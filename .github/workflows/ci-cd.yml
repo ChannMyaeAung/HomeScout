@@ -1,0 +1,155 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  PNPM_VERSION: 11.25.0
+  NODE_VERSION: 22
+
+jobs:
+  lint-and-typecheck:
+    name: Lint & TypeCheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: ./client
+
+      - name: Run lint
+        run: pnpm lint
+        working-directory: ./client
+
+      - name: TypeCheck client
+        run: npx tsc --noEmit
+        working-directory: ./client
+
+      - name: Install server dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: ./server
+
+      - name: TypeCheck server
+        run: npx tsc --noEmit
+        working-directory: ./server
+
+  build-client:
+    name: Build Client
+    needs: lint-and-typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install client dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: ./client
+
+      - name: Build client
+        run: pnpm build
+        working-directory: ./client
+        env:
+          NEXT_PUBLIC_API_BASE_URL: ${{ secrets.NEXT_PUBLIC_API_BASE_URL }}
+          NEXT_PUBLIC_AWS_COGNITO_USER_POOL_ID: ${{ secrets.NEXT_PUBLIC_AWS_COGNITO_USER_POOL_ID }}
+          NEXT_PUBLIC_AWS_COGNITO_USER_POOL_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_AWS_COGNITO_USER_POOL_CLIENT_ID }}
+          NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: ${{ secrets.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN }}
+
+      - name: Upload client build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-build
+          path: |
+            client/.next
+            client/public
+          retention-days: 1
+
+  build-server:
+    name: Build Server
+    needs: lint-and-typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install server dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: ./server
+
+      - name: Generate Prisma Client
+        run: pnpm prisma:generate
+        working-directory: ./server
+
+      - name: Build server
+        run: pnpm build
+        working-directory: ./server
+
+      - name: Upload server build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-build
+          path: |
+            server/dist
+            server/prisma
+          retention-days: 1
+
+  deploy-vercel:
+    name: Deploy to Vercel
+    needs: build-client
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download client build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: client-build
+          path: ./client
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+          working-directory: ./client

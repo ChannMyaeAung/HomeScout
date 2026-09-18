@@ -41,11 +41,11 @@ const FiltersBar = () => {
     // URLSearchParams handles encoding automatically (spaces, special chars, etc.)
     const updatedSearchParams = new URLSearchParams();
 
-    Object.entries(cleanFilters).forEach(([key, value]) => {
+    (Object.entries(cleanFilters) as [string, unknown][]).forEach(([key, value]) => {
       // URL params must be strings — arrays like [500, 2000] become "500,2000".
       updatedSearchParams.set(
         key,
-        Array.isArray(value) ? value.join(",") : value.toString(),
+        Array.isArray(value) ? value.join(",") : String(value),
       );
     });
 
@@ -57,26 +57,31 @@ const FiltersBar = () => {
   // isMin is boolean for range fields (true = min bound, false = max bound)
   // and null for every other field type that doesn't have a min/max concept.
   const handleFilterChange = (
-    key: string,
-    value: any,
+    key: keyof FiltersState,
+    value: string | number | null,
     isMin: boolean | null,
   ) => {
-    let newValue = value;
+    let newValue: FiltersState[keyof FiltersState] = value as FiltersState[keyof FiltersState];
 
     if (key === "priceRange" || key === "squareFeet") {
       // These are [min, max] tuples — the UI changes one end at a time.
       // Spread to avoid mutating the Redux state object directly.
-      const currentArrayRange = [...filters[key]];
+      const currentArrayRange = [...filters[key]] as [number | null, number | null];
       if (isMin !== null) {
         const index = isMin ? 0 : 1;
         // "any" from the select means "no bound" — stored as null in the tuple.
         currentArrayRange[index] = value === "any" ? null : Number(value);
       }
-      newValue = currentArrayRange;
+      // Cast to the correct tuple type
+      newValue = (currentArrayRange[0] === null && currentArrayRange[1] === null
+        ? [null, null]
+        : [currentArrayRange[0] as number, currentArrayRange[1] as number]) as FiltersState[keyof FiltersState];
     } else if (key === "coordinates") {
-      newValue = value === "any" ? [0, 0] : value.map(Number);
+      // coordinates is always [number, number], value should be an array here
+      const coordValue = value as unknown as number[];
+      newValue = value === "any" ? [0, 0] : coordValue.map(Number) as [number, number];
     } else {
-      newValue = value === "any" ? "any" : value;
+      newValue = value === "any" ? "any" : (value as FiltersState[keyof FiltersState]);
     }
 
     // Update Redux (re-renders UI immediately) and the URL (preserves browser history).

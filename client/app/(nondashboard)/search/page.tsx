@@ -24,7 +24,7 @@ const SearchPage = () => {
     // .reduce() walks thru them and builds up a single filter object "acc"
     // starting from {}.
     const initialFilters = Array.from(searchParams.entries()).reduce(
-      (acc: any, [key, value]) => {
+      (acc: Record<string, unknown>, [key, value]) => {
         // Step 2: Handle each key's type differently
         // PriceRange=500, 2000 -> "500,2000" in the URL, but we want [500, 2000] in our filter state. (number tuple)
         // squareFeet=,1500 -> ",1500" in the URL, but we want [null, 1500] in our filter state (null means "no min"/"no max"). (null = "no min")

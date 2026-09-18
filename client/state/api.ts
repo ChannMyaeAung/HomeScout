@@ -1,4 +1,4 @@
-import { cleanParams, createNewUserInDatabase, withToast } from "@/lib/utils";
+import { cleanParams, createNewUserInDatabase, withToast, FetchWithBQ } from "@/lib/utils";
 import {
   Application,
   Lease,
@@ -7,9 +7,16 @@ import {
   Property,
   Tenant,
 } from "@/types/prisma/browser";
+import { AuthUser } from "aws-amplify/auth";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { fetchAuthSession, getCurrentUser } from "aws-amplify/auth";
 import { FiltersState } from ".";
+
+interface User {
+  cognitoInfo: AuthUser;
+  userInfo: Tenant | Manager;
+  userRole: string;
+}
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({
@@ -61,14 +68,15 @@ export const api = createApi({
           // we are gonna try and call getTenant in /server/src/controllers/tenantControllers.ts and see if it returns 404, if it does, we will create a new tenant with the same cognitoId as the user
           if (
             userDetailsResponse.error &&
-            userDetailsResponse.error.status === 404
+            userDetailsResponse.error.status === 404 &&
+            idToken
           ) {
             userDetailsResponse = await createNewUserInDatabase(
               user,
               idToken,
               userRole,
-              fetchWithBQ,
-            );
+              fetchWithBQ as FetchWithBQ,
+            ) as typeof userDetailsResponse;
           }
 
           return {
@@ -78,8 +86,9 @@ export const api = createApi({
               userRole,
             },
           };
-        } catch (error: any) {
-          return { error: error.message || "Could not fetch user data." };
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Could not fetch user data.";
+          return { error: { status: "CUSTOM_ERROR", error: message, data: message } };
         }
       },
     }),
@@ -182,7 +191,7 @@ export const api = createApi({
       // withToast is a utility that shows a toast notification based on the promise result
       async onQueryStarted(
         _arg,
-        { queryFulfilled }: { queryFulfilled: Promise<any> },
+        { queryFulfilled }: { queryFulfilled: Promise<unknown> },
       ) {
         await withToast(queryFulfilled, {
           error: "Failed to fetch properties",
@@ -241,7 +250,7 @@ export const api = createApi({
       ],
       async onQueryStarted(
         _arg,
-        { queryFulfilled }: { queryFulfilled: Promise<any> },
+        { queryFulfilled }: { queryFulfilled: Promise<unknown> },
       ) {
         await withToast(queryFulfilled, {
           success: "Added to favorites!!",

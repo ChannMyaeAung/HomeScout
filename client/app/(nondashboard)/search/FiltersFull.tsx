@@ -40,10 +40,10 @@ const FiltersFull = () => {
     const cleanFilters = cleanParams(newFilters);
     const updatedSearchParams = new URLSearchParams();
 
-    Object.entries(cleanFilters).forEach(([key, value]) => {
+    (Object.entries(cleanFilters) as [string, unknown][]).forEach(([key, value]) => {
       updatedSearchParams.set(
         key,
-        Array.isArray(value) ? value.join(",") : value.toString(),
+        Array.isArray(value) ? value.join(",") : String(value),
       );
     });
 
@@ -158,7 +158,7 @@ const FiltersFull = () => {
               localFilters.priceRange[0] ?? 0,
               localFilters.priceRange[1] ?? 10000,
             ]}
-            onValueChange={(value: any) =>
+            onValueChange={(value: [number, number]) =>
               setLocalFilters((prev) => ({
                 ...prev,
                 priceRange: value as [number, number],

@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
+import { FiltersState } from "@/state";
 
 /** Merges Tailwind classes, resolving conflicts via tailwind-merge. */
 export function cn(...inputs: ClassValue[]) {
@@ -11,12 +12,28 @@ export function cn(...inputs: ClassValue[]) {
  * Creates a user record in the backend after Cognito sign-up.
  * Routes to /managers or /tenants based on the Cognito group role.
  */
+interface CognitoUser {
+  userId: string;
+  username: string;
+}
+
+interface IdToken {
+  payload: {
+    email?: string;
+    [key: string]: unknown;
+  };
+}
+
+export interface FetchWithBQ {
+  (arg: string | { url: string; method?: string; body?: unknown }): Promise<{ error?: { status?: number | string; error?: string }; data?: unknown; meta?: unknown }>;
+}
+
 export const createNewUserInDatabase = async (
-  user: any,
-  idToken: any,
+  user: CognitoUser,
+  idToken: IdToken,
   userRole: string,
-  fetchWithBQ: any,
-) => {
+  fetchWithBQ: FetchWithBQ,
+): Promise<{ error?: { status?: number | string; error?: string; data?: unknown }; data?: unknown }> => {
   const createEndpoint =
     userRole?.toLowerCase() === "manager" ? "/managers" : "/tenants";
 
@@ -43,7 +60,7 @@ export const createNewUserInDatabase = async (
  * Redux state always carries a value for every field, so without this step the
  * API would receive noise like `beds=any` or `priceRange=null,null`.
  */
-export function cleanParams(params: Record<string, any>): Record<string, any> {
+export function cleanParams(params: { [key: string]: unknown } | FiltersState): { [key: string]: unknown } {
   return Object.fromEntries(
     Object.entries(params).filter(
       ([_, value]) =>
